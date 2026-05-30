@@ -21,43 +21,43 @@ flowchart LR
     %% --- SISTEMA DEL RESTAURANTE (PRODUCER) ---
     subgraph Producer [Microservicio 1: Productor]
         direction TB
-        CLI[main_producer.py\n(CLI Adapter)]:::adapter
+        CLI["main_producer.py<br>(CLI Adapter)"]:::adapter
         
         subgraph CoreProd [Núcleo Hexagonal]
-            DS[Application:\nDinnerService]:::core
-            DE[Domain:\nDinnerEvent]:::core
-            MPP{{Port:\nMessagePublisherPort}}:::port
+            DS["Application:<br>DinnerService"]:::core
+            DE["Domain:<br>DinnerEvent"]:::core
+            MPP{{"Port:<br>MessagePublisherPort"}}:::port
             
             DS -->|Instancia| DE
             DS -->|Llama para publicar| MPP
         end
         
-        RPA[Adapter:\nRabbitMQPublisher]:::adapter
+        RPA["Adapter:<br>RabbitMQPublisher"]:::adapter
         
         CLI -->|Orquesta| DS
         RPA -.->|Implementa| MPP
     end
 
     %% --- BROKER ---
-    Broker((RabbitMQ\nBroker)):::external
+    Broker(("RabbitMQ<br>Broker")):::external
 
     %% --- SISTEMA DE RECOMPENSAS (CONSUMER) ---
     subgraph Consumer [Microservicio 2: Consumidor]
         direction TB
-        RCA[Adapter:\nRabbitMQConsumer]:::adapter
+        RCA["Adapter:<br>RabbitMQConsumer"]:::adapter
         
         subgraph CoreCons [Núcleo Hexagonal]
-            MCP{{Port:\nMessageConsumerPort}}:::port
-            RS[Application:\nRewardsService]:::core
-            RC[Domain:\nRewardsCalculator]:::core
-            RRP{{Port:\nRewardsRepositoryPort}}:::port
+            MCP{{"Port:<br>MessageConsumerPort"}}:::port
+            RS["Application:<br>RewardsService"]:::core
+            RC["Domain:<br>RewardsCalculator"]:::core
+            RRP{{"Port:<br>RewardsRepositoryPort"}}:::port
             
             MCP -->|Invoca| RS
             RS -->|Aplica reglas| RC
             RS -->|Ordena guardar| RRP
         end
         
-        IMR[(Adapter:\nInMemoryRepository)]:::adapter
+        IMR[("Adapter:<br>InMemoryRepository")]:::adapter
         
         RCA -.->|Implementa/Llama a| MCP
         IMR -.->|Implementa| RRP
