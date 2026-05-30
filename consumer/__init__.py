@@ -1,0 +1,1 @@
+"""Consumer package — Rewards System."""
