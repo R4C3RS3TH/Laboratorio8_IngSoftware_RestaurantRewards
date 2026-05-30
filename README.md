@@ -10,7 +10,63 @@ Este proyecto implementa dos microservicios desacoplados que se comunican a trav
 
 ### Diagrama del sistema
 
-![Diagrama de Arquitectura](docs/architecture.png)
+```mermaid
+flowchart LR
+    %% Estilos
+    classDef core fill:#e6d4ff,stroke:#663399,stroke-width:2px,color:#000;
+    classDef adapter fill:#cceeff,stroke:#0077b3,stroke-width:2px,color:#000;
+    classDef external fill:#ffecd9,stroke:#cc5200,stroke-width:2px,color:#000;
+    classDef port fill:#fffbcce,stroke:#b38f00,stroke-width:2px,shape:hexagon,color:#000;
+
+    %% --- SISTEMA DEL RESTAURANTE (PRODUCER) ---
+    subgraph Producer [Microservicio 1: Productor]
+        direction TB
+        CLI[main_producer.py\n(CLI Adapter)]:::adapter
+        
+        subgraph CoreProd [Núcleo Hexagonal]
+            DS[Application:\nDinnerService]:::core
+            DE[Domain:\nDinnerEvent]:::core
+            MPP{{Port:\nMessagePublisherPort}}:::port
+            
+            DS -->|Instancia| DE
+            DS -->|Llama para publicar| MPP
+        end
+        
+        RPA[Adapter:\nRabbitMQPublisher]:::adapter
+        
+        CLI -->|Orquesta| DS
+        RPA -.->|Implementa| MPP
+    end
+
+    %% --- BROKER ---
+    Broker((RabbitMQ\nBroker)):::external
+
+    %% --- SISTEMA DE RECOMPENSAS (CONSUMER) ---
+    subgraph Consumer [Microservicio 2: Consumidor]
+        direction TB
+        RCA[Adapter:\nRabbitMQConsumer]:::adapter
+        
+        subgraph CoreCons [Núcleo Hexagonal]
+            MCP{{Port:\nMessageConsumerPort}}:::port
+            RS[Application:\nRewardsService]:::core
+            RC[Domain:\nRewardsCalculator]:::core
+            RRP{{Port:\nRewardsRepositoryPort}}:::port
+            
+            MCP -->|Invoca| RS
+            RS -->|Aplica reglas| RC
+            RS -->|Ordena guardar| RRP
+        end
+        
+        IMR[(Adapter:\nInMemoryRepository)]:::adapter
+        
+        RCA -.->|Implementa/Llama a| MCP
+        IMR -.->|Implementa| RRP
+    end
+
+    %% --- CONEXIONES ENTRE SISTEMAS ---
+    RPA ===>|1. Publica Evento| Broker
+    Broker ===>|2. Entrega Mensaje| RCA
+```
 
 ---
 
@@ -75,8 +131,6 @@ restaurant_rewards/
 │   ├── test_rewards_service.py
 │   └── test_settings.py
 │
-├── docs/
-│   └── architecture.png        # Diagrama de arquitectura
 ├── .env.example                # Plantilla de variables de entorno
 ├── .gitignore
 ├── pyproject.toml
