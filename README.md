@@ -256,6 +256,8 @@ Atributos de calidad evaluados:
 
 ---
 
-## Autores
+## Autor
 
-Proyecto desarrollado para el curso **CS3081 - Ingenieria de Software** — UTEC.
+- **Leonardo Fabian Chocce Rios**
+
+*Proyecto desarrollado para el curso **CS3081 - Ingeniería de Software** — UTEC.*
