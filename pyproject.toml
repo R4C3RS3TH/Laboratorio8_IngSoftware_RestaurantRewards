@@ -15,7 +15,7 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --cov=producer --cov=consumer --cov=config --cov-report=xml --cov-report=term-missing"
+addopts = "-v --cov=. --cov-report=xml --cov-report=term-missing"
 
 [tool.coverage.run]
 omit = [
